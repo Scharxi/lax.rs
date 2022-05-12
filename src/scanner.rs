@@ -100,6 +100,9 @@ impl Scanner {
                             break;
                         };
                     }
+                } else if self.matches('*') {
+                    // block comment start
+                    self.scan_comment()?;
                 } else {
                     self.add_token(TokenType::Slash, None);
                 }
@@ -171,6 +174,35 @@ impl Scanner {
         let value: String = self.source[self.start + 1..self.current - 1].iter().collect();
         self.add_token(TokenType::String, Some(Object::Str(value)));
         Ok(())
+    }
+
+    fn scan_comment(&mut self) -> Result<(), LaxError> {
+        loop {
+            match self.peek() {
+                Some('*') => {
+                    self.advance();
+                    if self.matches('/') {
+                        return Ok(());
+                    }
+                },
+                Some('/') => {
+                    self.advance();
+                    if self.matches('*') {
+                        self.scan_comment();
+                    }
+                }
+                Some('\n') => {
+                    self.advance();
+                    self.line += 1;
+                }
+                None => {
+                    return Err(LaxError::error(self.line, "Unterminated comment".to_string()))
+                }
+                _ => {
+                    self.advance();
+                }
+            }
+        }
     }
 
     fn number(&mut self) -> Result<(), LaxError> {

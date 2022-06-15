@@ -1,0 +1,11 @@
+[package]
+name = "lax"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ast-generator = {path = "../ast-generator"}
+interpreter = {path = "../interpreter"}
+clap = {version = "3.1.18", features=["derive"]}

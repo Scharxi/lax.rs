@@ -1,7 +1,7 @@
 use std::fmt;
 use std::fmt::Formatter;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,
@@ -59,7 +59,7 @@ pub enum TokenType {
     EOF,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Object {
     Num(f64),
     Str(String),
@@ -80,7 +80,7 @@ impl fmt::Display for Object {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub t_type: TokenType,
     pub lexeme: String,
@@ -91,6 +91,10 @@ pub struct Token {
 impl Token {
     pub fn new(t_type: TokenType, lexeme: String, literal: Option<Object>, line: usize) -> Self {
         Self { t_type, lexeme, literal, line }
+    }
+
+    pub fn is(&self, ttype: TokenType) -> bool {
+        self.t_type == ttype
     }
 
     pub fn eof(current_line: usize) -> Token {

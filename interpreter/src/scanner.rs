@@ -188,7 +188,7 @@ impl Scanner {
                 Some('/') => {
                     self.advance();
                     if self.matches('*') {
-                        self.scan_comment();
+                        self.scan_comment()?;
                     }
                 }
                 Some('\n') => {

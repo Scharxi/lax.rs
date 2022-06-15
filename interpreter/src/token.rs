@@ -75,7 +75,7 @@ impl fmt::Display for Object {
             Object::Str(str) => write!(f, "\"{}\"", str),
             Object::Nil => write!(f, "nil"),
             Object::True => write!(f, "true"),
-            Object::False => write!(f, "false")
+            Object::False => write!(f, "false"),
         }
     }
 }
@@ -90,7 +90,12 @@ pub struct Token {
 
 impl Token {
     pub fn new(t_type: TokenType, lexeme: String, literal: Option<Object>, line: usize) -> Self {
-        Self { t_type, lexeme, literal, line }
+        Self {
+            t_type,
+            lexeme,
+            literal,
+            line,
+        }
     }
 
     pub fn is(&self, ttype: TokenType) -> bool {
@@ -98,21 +103,22 @@ impl Token {
     }
 
     pub fn eof(current_line: usize) -> Token {
-        Token::new(
-            TokenType::EOF,
-            "".to_string(),
-            None,
-            current_line
-        )
+        Token::new(TokenType::EOF, "".to_string(), None, current_line)
     }
 }
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?} {} {:?}", self.t_type, self.lexeme, if let Some(literal) = &self.literal {
-            literal.to_string();
-        } else {
-            "None".to_string();
-        })
+        write!(
+            f,
+            "{:?} {} {:?}",
+            self.t_type,
+            self.lexeme,
+            if let Some(literal) = &self.literal {
+                literal.to_string();
+            } else {
+                "None".to_string();
+            }
+        )
     }
 }

@@ -1,4 +1,4 @@
-use std::io::{self, BufRead, stdout, Write};
+use std::io::{self, stdout, BufRead, Write};
 
 use clap::{arg, Command};
 
@@ -9,29 +9,26 @@ use interpreter::printer::AstPrinter;
 use interpreter::scanner::Scanner;
 
 fn main() -> io::Result<()> {
-    let matches = Command::new(
-        "Lax Interpreter"
-    ).version(
-        "1.0.0"
-    ).author(
-        "BufferOverflow"
-    ).about("Console Interface for the Lox Interpreter")
-        .arg(
-            arg!([file_path] "File to interpret")
-        ).subcommand(
-        Command::new("ast")
-            .about("Used to generate the ast")
-            .arg(
-                arg!(-o --out <PATH> "Specify the output directory")
-            )
-    ).get_matches();
+    let matches = Command::new("Lax Interpreter")
+        .version("1.0.0")
+        .author("BufferOverflow")
+        .about("Console Interface for the Lox Interpreter")
+        .arg(arg!([file_path] "File to interpret"))
+        .subcommand(
+            Command::new("ast")
+                .about("Used to generate the ast")
+                .arg(arg!(-o --out <PATH> "Specify the output directory")),
+        )
+        .get_matches();
 
     if let Some(path) = matches.value_of("file_path") {
         run_file(&path.to_owned()).expect("Could not run file!")
     } else if let Some(("ast", sub_m)) = matches.subcommand() {
         let output = sub_m.value_of("out").unwrap();
         create_ast(output)?;
-    } else { run_prompt() }
+    } else {
+        run_prompt()
+    }
 
     Ok(())
 }
@@ -67,7 +64,7 @@ fn run(source: &str) -> Result<(), LaxError> {
     let tokens = scanner.scan_tokens()?;
     let mut parser = Parser::new(tokens.clone());
     match parser.parse() {
-        None => {},
+        None => {}
         Some(expr) => {
             println!("AST Printer: \n{}", AstPrinter::new().print(&expr)?);
         }

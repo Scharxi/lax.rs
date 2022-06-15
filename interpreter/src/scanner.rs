@@ -117,9 +117,12 @@ impl Scanner {
             }
             _ if c.is_ascii_alphabetic() || c == '_' => {
                 self.identifier();
-            },
+            }
             _ => {
-                return Err(LaxError::error(self.line, "Unexpected character.".to_string()));
+                return Err(LaxError::error(
+                    self.line,
+                    "Unexpected character.".to_string(),
+                ));
             }
         }
         Ok(())
@@ -147,7 +150,8 @@ impl Scanner {
 
     fn add_token(&mut self, t_type: TokenType, literal: Option<Object>) {
         let text: String = self.source[self.start..self.current].iter().collect();
-        self.tokens.push(Token::new(t_type, text, literal, self.line));
+        self.tokens
+            .push(Token::new(t_type, text, literal, self.line));
     }
 
     fn string(&mut self) -> Result<(), LaxError> {
@@ -164,14 +168,19 @@ impl Scanner {
             self.advance();
         }
         if self.is_at_end() {
-            return Err(LaxError::error(self.line, "Unterminated string".to_string()));
+            return Err(LaxError::error(
+                self.line,
+                "Unterminated string".to_string(),
+            ));
         }
 
         // The closing ".
         self.advance();
 
         // TODO: Handle Escape Sequences
-        let value: String = self.source[self.start + 1..self.current - 1].iter().collect();
+        let value: String = self.source[self.start + 1..self.current - 1]
+            .iter()
+            .collect();
         self.add_token(TokenType::String, Some(Object::Str(value)));
         Ok(())
     }
@@ -184,7 +193,7 @@ impl Scanner {
                     if self.matches('/') {
                         return Ok(());
                     }
-                },
+                }
                 Some('/') => {
                     self.advance();
                     if self.matches('*') {
@@ -196,7 +205,10 @@ impl Scanner {
                     self.line += 1;
                 }
                 None => {
-                    return Err(LaxError::error(self.line, "Unterminated comment".to_string()))
+                    return Err(LaxError::error(
+                        self.line,
+                        "Unterminated comment".to_string(),
+                    ))
                 }
                 _ => {
                     self.advance();
@@ -216,7 +228,10 @@ impl Scanner {
             }
         }
         let value: String = self.source[self.start..self.current].iter().collect();
-        self.add_token(TokenType::Number, Some(Object::Num(value.parse::<f64>().unwrap())));
+        self.add_token(
+            TokenType::Number,
+            Some(Object::Num(value.parse::<f64>().unwrap())),
+        );
         Ok(())
     }
 
@@ -258,7 +273,7 @@ impl Scanner {
             "is" => Some(TokenType::Is),
             "in" => Some(TokenType::In),
             "return" => Some(TokenType::Return),
-            _ => None
+            _ => None,
         }
     }
 

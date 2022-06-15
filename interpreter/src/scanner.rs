@@ -61,6 +61,8 @@ impl Scanner {
             '!' => {
                 let tok = if self.matches('=') {
                     TokenType::BangEqual
+                } else if self.matches_str("in") {
+                    TokenType::BangIn
                 } else {
                     TokenType::Bang
                 };
@@ -136,6 +138,19 @@ impl Scanner {
             }
             _ => false,
         }
+    }
+
+    fn matches_str(&mut self, expected: &str) -> bool {
+        let mut i = 0;
+        while i < expected.len() {
+            if self.source.get(self.current + i).copied() != Some(expected.chars().nth(i).unwrap())
+            {
+                return false;
+            }
+            i += 1;
+        }
+        self.current += expected.len();
+        true
     }
 
     fn peek(&self) -> Option<char> {
@@ -242,7 +257,13 @@ impl Scanner {
 
         let value: String = self.source[self.start..self.current].iter().collect();
         if let Some(t_type) = Scanner::keyword(value.as_str()) {
-            self.add_token(t_type, None);
+            if t_type == TokenType::True {
+                self.add_token(TokenType::True, Some(Object::Bool(true)));
+            } else if t_type == TokenType::False {
+                self.add_token(TokenType::False, Some(Object::Bool(false)));
+            } else {
+                self.add_token(t_type, None);
+            }
         } else {
             self.add_token(TokenType::Identifier, None)
         }

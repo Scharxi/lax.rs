@@ -28,7 +28,7 @@ impl Parser {
     fn equality(&mut self) -> Result<Expr, LaxError> {
         let mut expr = self.comparison()?;
 
-        while self.match_token(&[TokenType::Equal, TokenType::BangEqual, TokenType::Not]) {
+        while self.match_token(&[TokenType::Equal, TokenType::BangEqual, TokenType::BangIn]) {
             let operator = self.previous();
             let right = self.comparison()?;
             expr = Expr::Binary(BinaryExpr {
@@ -49,6 +49,8 @@ impl Parser {
             TokenType::GreaterEqual,
             TokenType::Less,
             TokenType::LessEqual,
+            TokenType::EqualEqual,
+            TokenType::In,
         ]) {
             let operator = self.previous();
             let right = self.term()?;
@@ -94,7 +96,12 @@ impl Parser {
     }
 
     fn unary(&mut self) -> Result<Expr, LaxError> {
-        if self.match_token(&[TokenType::Slash, TokenType::Star]) {
+        if self.match_token(&[
+            TokenType::Bang,
+            TokenType::Minus,
+            TokenType::Not,
+            TokenType::Plus,
+        ]) {
             let operator = self.previous();
             let right = self.unary()?;
             return Ok(Expr::Unary(UnaryExpr {
@@ -108,11 +115,11 @@ impl Parser {
     fn primary(&mut self) -> Result<Expr, LaxError> {
         if self.match_token(&[TokenType::True]) {
             Ok(Expr::Literal(LiteralExpr {
-                value: Some(Object::True),
+                value: Some(Object::Bool(true)),
             }))
         } else if self.match_token(&[TokenType::False]) {
             Ok(Expr::Literal(LiteralExpr {
-                value: Some(Object::False),
+                value: Some(Object::Bool(false)),
             }))
         } else if self.match_token(&[TokenType::Nil]) {
             Ok(Expr::Literal(LiteralExpr {

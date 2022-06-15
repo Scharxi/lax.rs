@@ -18,10 +18,6 @@ impl Expr {
     }
 }
 
-pub struct CommaExpr {
-    pub exprs: Vec<Expr>,
-}
-
 pub struct BinaryExpr {
     pub left: Box<Expr>,
     pub operator: Token,
@@ -40,6 +36,13 @@ pub struct UnaryExpr {
     pub operator: Token,
     pub right: Box<Expr>,
 }
+
+pub struct DoubleExpr {
+    pub left: Box<Expr>,
+    pub operator_one: Token,
+    pub operator_2: Token,
+    pub right: Box<Expr>,
+}
 pub trait ExprVisitor<T> {
     fn visit_binary_expr(&self, expr: &BinaryExpr) -> Result<T, LaxError>;
     fn visit_grouping_expr(&self, expr: &GroupingExpr) -> Result<T, LaxError>;
@@ -48,25 +51,25 @@ pub trait ExprVisitor<T> {
 }
 
 impl BinaryExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, LaxError> {
+    fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, LaxError> {
         visitor.visit_binary_expr(self)
     }
 }
 
 impl GroupingExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, LaxError> {
+    fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, LaxError> {
         visitor.visit_grouping_expr(self)
     }
 }
 
 impl LiteralExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, LaxError> {
+    fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, LaxError> {
         visitor.visit_literal_expr(self)
     }
 }
 
 impl UnaryExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, LaxError> {
+    fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, LaxError> {
         visitor.visit_unary_expr(self)
     }
 }

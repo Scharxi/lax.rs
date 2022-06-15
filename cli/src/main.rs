@@ -4,8 +4,8 @@ use clap::{arg, Command};
 
 use ast_generator::ast;
 use interpreter::error::LaxError;
+use interpreter::interpreter::Interpreter;
 use interpreter::parser::Parser;
-use interpreter::printer::AstPrinter;
 use interpreter::scanner::Scanner;
 
 fn main() -> io::Result<()> {
@@ -43,6 +43,7 @@ fn run_file(path: &String) -> io::Result<()> {
 
 fn run_prompt() {
     let stdin = io::stdin();
+    let _ = stdout().flush();
     print!("> ");
     let _ = stdout().flush();
     for line in stdin.lock().lines() {
@@ -63,10 +64,11 @@ fn run(source: &str) -> Result<(), LaxError> {
     let scanner = Scanner::new(source.to_string());
     let tokens = scanner.scan_tokens()?;
     let mut parser = Parser::new(tokens.clone());
+    let interpreter = Interpreter {};
     match parser.parse() {
         None => {}
         Some(expr) => {
-            println!("AST Printer: \n{}", AstPrinter::new().print(&expr)?);
+            interpreter.interpret(&expr)?;
         }
     }
 

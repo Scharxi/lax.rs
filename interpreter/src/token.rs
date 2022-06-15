@@ -31,6 +31,8 @@ pub enum TokenType {
     Identifier,
     Number,
 
+    BangIn,
+
     // Keywords
     And,
     Class,
@@ -63,9 +65,16 @@ pub enum TokenType {
 pub enum Object {
     Num(f64),
     Str(String),
+    Bool(bool),
     Nil,
     True,
     False,
+}
+
+impl From<bool> for Object {
+    fn from(boo: bool) -> Self {
+        Object::Bool(boo)
+    }
 }
 
 impl fmt::Display for Object {
@@ -76,6 +85,7 @@ impl fmt::Display for Object {
             Object::Nil => write!(f, "nil"),
             Object::True => write!(f, "true"),
             Object::False => write!(f, "false"),
+            Object::Bool(b) => write!(f, "{}", b),
         }
     }
 }

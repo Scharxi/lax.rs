@@ -42,14 +42,14 @@ pub mod expressions {
         writeln!(file, "}}")?;
 
         writeln!(file, "impl {base_name} {{")?;
-        writeln!(file, "\tpub fn accept<T>(&self, {}_visitor: &dyn {base_name}Visitor<T>) -> Result<T, LaxError> {{", base_name.to_lowercase())?;
+        writeln!(file, "\tfn accept<T>(&self, {}_visitor: &dyn {base_name}Visitor<T>) -> Result<T, LaxError> {{", base_name.to_lowercase())?;
         writeln!(file, "\t\tmatch self {{")?;
         for t in &tree_types {
             writeln!(
                 file,
                 "\t\t\t{}::{}(v) => v.accept({}_visitor),",
                 base_name,
-                t.base_name.to_lowercase(),
+                t.base_name,
                 base_name.to_lowercase()
             )?;
         }
@@ -60,7 +60,7 @@ pub mod expressions {
         for t in &tree_types {
             writeln!(file, "\npub struct {} {{", &t.class_name)?;
             for field in &t.fields {
-                writeln!(file, "\t{},", field)?;
+                writeln!(file, "\tpub {},", field)?;
             }
             writeln!(file, "}}")?;
         }
@@ -70,7 +70,7 @@ pub mod expressions {
         for t in &tree_types {
             writeln!(
                 file,
-                "\tfn visit_{}_{}(&self, expr: &{}) -> Result<T, LaxError>;",
+                "\tpub fn visit_{}_{}(&self, expr: &{}) -> Result<T, LaxError>;",
                 t.base_name.to_lowercase(),
                 base_name.to_lowercase(),
                 t.class_name

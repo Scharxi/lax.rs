@@ -1,3 +1,5 @@
+//! This module contains the logic to evaluate expressions 
+
 use crate::{
     error::LaxError,
     expr::{Expr, ExprVisitor},
@@ -13,10 +15,22 @@ impl Interpreter {
         Ok(value)
     }
 
+    /// Evaluates the given expression by calling the appropriate visitor method.
+    /// 
+    /// Returns the result of the evaluation.
     fn evaluate(&self, expr: &Expr) -> Result<Object, LaxError> {
         expr.accept(self)
     }
 
+    /// Checks if the given object is truthy or falsey.
+    /// # Returns
+    /// `false` if the object is nil
+    /// 
+    /// `true` or `false` depending on the [`Object::Bool`] value
+    /// 
+    /// `true` or `false` for [`Object::Str`] if the string is not empty
+    /// 
+    /// `true` for everything else
     fn is_truthy(&self, object: &Object) -> bool {
         match object {
             Object::Nil => false,
@@ -269,7 +283,7 @@ impl ExprVisitor<Object> for Interpreter {
                         } else {
                             return Err(LaxError::error(
                                 expr.operator.line,
-                                format!("Could not parse {:?} to a number", value),
+                                format!("Could not parse {} to a number", value),
                             ));
                         }
                     }

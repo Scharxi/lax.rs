@@ -1,8 +1,9 @@
-//! This module contains the logic to evaluate expressions 
+//! This module contains the logic to evaluate expressions
 
 use crate::{
     error::LaxError,
     expr::{Expr, ExprVisitor},
+    stmt::{Stmt, StmtVisitor},
     token::{Object, TokenType},
 };
 
@@ -15,8 +16,19 @@ impl Interpreter {
         Ok(value)
     }
 
+    pub fn interpret_statement(&self, stmts: &Vec<Stmt>) -> Result<(), LaxError> {
+        for stmt in stmts {
+            self.execute(stmt)?;
+        }
+        Ok(())
+    }
+
+    fn execute(&self, stmt: &Stmt) -> Result<(), LaxError> {
+        stmt.accept(self)
+    }
+
     /// Evaluates the given expression by calling the appropriate visitor method.
-    /// 
+    ///
     /// Returns the result of the evaluation.
     fn evaluate(&self, expr: &Expr) -> Result<Object, LaxError> {
         expr.accept(self)
@@ -25,11 +37,11 @@ impl Interpreter {
     /// Checks if the given object is truthy or falsey.
     /// # Returns
     /// `false` if the object is nil
-    /// 
+    ///
     /// `true` or `false` depending on the [`Object::Bool`] value
-    /// 
+    ///
     /// `true` or `false` for [`Object::Str`] if the string is not empty
-    /// 
+    ///
     /// `true` for everything else
     fn is_truthy(&self, object: &Object) -> bool {
         match object {
@@ -300,5 +312,18 @@ impl ExprVisitor<Object> for Interpreter {
             }
             _ => return Err(LaxError::error(0, "Unreachable".to_owned())),
         };
+    }
+}
+
+impl StmtVisitor<()> for Interpreter {
+    fn visit_expression_stmt(&self, expr: &crate::stmt::ExpressionStmt) -> Result<(), LaxError> {
+        self.evaluate(&expr.expression)?;
+        Ok(())
+    }
+
+    fn visit_print_stmt(&self, expr: &crate::stmt::PrintStmt) -> Result<(), LaxError> {
+        let value = self.evaluate(&expr.expression)?;
+        println!("{}", value);
+        Ok(())
     }
 }

@@ -70,7 +70,7 @@ pub mod expressions {
         for t in &tree_types {
             writeln!(
                 file,
-                "\fn visit_{}_{}(&self, expr: &{}) -> Result<T, LaxError>;",
+                "\tfn visit_{}_{}(&self, expr: &{}) -> Result<T, LaxError>;",
                 t.base_name.to_lowercase(),
                 base_name.to_lowercase(),
                 t.class_name

@@ -64,13 +64,23 @@ fn run(source: &str) -> Result<(), LaxError> {
     let scanner = Scanner::new(source.to_string());
     let tokens = scanner.scan_tokens()?;
     let mut parser = Parser::new(tokens.clone());
+    let stmts = parser.parse_statement();
     let interpreter = Interpreter {};
-    match parser.parse() {
+
+    /*match parser.parse() {
         None => {}
         Some(expr) => {
             interpreter.interpret(&expr)?;
+
         }
-    }
+    }*/
+
+    match stmts {
+        Err(err) => err,
+        Ok(stms) => {
+            return interpreter.interpret_statement(&stms);
+        }
+    };
 
     Ok(())
 }
@@ -83,8 +93,17 @@ fn create_ast(outdir: &str) -> io::Result<()> {
         &vec![
             "Binary    : Box<Expr> left, Token operator, Box<Expr> right",
             "Grouping  : Box<Expr> expression",
-            "Literal   : Object value",
+            "Literal   : Option<Object> value",
             "Unary     : Token operator,Box<Expr> right",
+        ],
+    )?;
+
+    ast::expressions::define_ast(
+        outdir,
+        "Stmt",
+        &[
+            "Expression : Expr expression",
+            "Print      : Expr expression",
         ],
     )?;
 

@@ -1,6 +1,7 @@
 use crate::{
     error::LaxError,
     expr::{BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr},
+    stmt::{ExpressionStmt, PrintStmt, Stmt},
     token::{Object, Token, TokenType},
 };
 
@@ -19,6 +20,33 @@ impl Parser {
             Ok(expr) => Some(expr),
             Err(_) => None,
         }
+    }
+
+    pub fn parse_statement(&mut self) -> Result<Vec<Stmt>, LaxError> {
+        let mut stmts: Vec<Stmt> = Vec::new();
+        while !self.is_at_end() {
+            stmts.push(self.statement()?);
+        }
+        Ok(stmts)
+    }
+
+    fn statement(&mut self) -> Result<Stmt, LaxError> {
+        if self.match_token(&[TokenType::Print]) {
+            return self.print_statement();
+        }
+        self.expr_statement()
+    }
+
+    fn print_statement(&mut self) -> Result<Stmt, LaxError> {
+        let expr = self.expression()?;
+        self.consume(TokenType::Semicolon, "Expect ';' after expression.")?;
+        Ok(Stmt::Print(PrintStmt { expression: expr }))
+    }
+
+    fn expr_statement(&mut self) -> Result<Stmt, LaxError> {
+        let expr = self.expression()?;
+        self.consume(TokenType::Semicolon, "Expect ';' after expression.")?;
+        Ok(Stmt::Expression(ExpressionStmt { expression: expr }))
     }
 
     fn expression(&mut self) -> Result<Expr, LaxError> {

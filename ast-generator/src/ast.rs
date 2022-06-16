@@ -42,7 +42,7 @@ pub mod expressions {
         writeln!(file, "}}")?;
 
         writeln!(file, "impl {base_name} {{")?;
-        writeln!(file, "\tfn accept<T>(&self, {}_visitor: &dyn {base_name}Visitor<T>) -> Result<T, LaxError> {{", base_name.to_lowercase())?;
+        writeln!(file, "\tpub fn accept<T>(&self, {}_visitor: &dyn {base_name}Visitor<T>) -> Result<T, LaxError> {{", base_name.to_lowercase())?;
         writeln!(file, "\t\tmatch self {{")?;
         for t in &tree_types {
             writeln!(
@@ -65,12 +65,12 @@ pub mod expressions {
             writeln!(file, "}}")?;
         }
 
-        writeln!(file, "pub trait ExprVisitor<T> {{")?;
+        writeln!(file, "pub trait {}Visitor<T> {{", base_name)?;
 
         for t in &tree_types {
             writeln!(
                 file,
-                "\tpub fn visit_{}_{}(&self, expr: &{}) -> Result<T, LaxError>;",
+                "\fn visit_{}_{}(&self, expr: &{}) -> Result<T, LaxError>;",
                 t.base_name.to_lowercase(),
                 base_name.to_lowercase(),
                 t.class_name
